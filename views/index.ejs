@@ -1,11 +1,74 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <title>My Angular App!</title>
+    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.10/angular.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
+    <script src="/javascripts/angularApp.js"></script>
+</head>
+<body ng-app="flapperNews" ng-controller="MainCtrl">
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <ui-view></ui-view>
+    </div>
+</div>
+<script type="text/ng-template" id="/home.html">
+    <div class="page-header">
+        <h1>Flapper News</h1>
+    </div>
+    <div ng-repeat="itemPost in posts | orderBy:'-upVotes'">
+        <span class="glyphicon glyphicon-thumbs-up" ng-click="incrementUpVotes(itemPost)"></span>
+        {{itemPost.upVotes}}
+        <span class="post-title">
+            <a ng-show="itemPost.link" href="{{itemPost.link}}">
+                {{itemPost.title}}
+            </a>
+            <span ng-hide="itemPost.link">{{itemPost.title}}</span>
+        </span>
+        <span>
+            <a href="#/posts/{{$index}}">Comments</a>
+        </span>
+    </div>
+    <form ng-submit="addPost()">
+        <h3>Add a new post</h3>
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Title" ng-model="title">
+        </div>
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Link" ng-model="link">
+        </div>
+        <button type="submit" class="btn btn-primary">Post</button>
+    </form>
+</script>
+<script type="text/ng-template" id="/posts.html">
+    <div class="page-header">
+        <h3>
+            <a ng-show="post.link" href="{{post.link}}">
+                {{post.title}}
+            </a>
+            <span ng-hide="post.link">
+                {{post.title}}
+            </span>
+        </h3>
+    </div>
+    <div ng-repeat="itemComment in post.comments | orderBy: '-upVotes'">
+        <span class="glyphicon glyphicon-thumbs-up" ng-click="incrementUpVotes(itemComment)">
+            {{itemComment.upVotes}} - by {{itemComment.author}}
+            <span class="comment-body">
+                {{itemComment.body}}
+            </span>
+        </span>
+    </div>
+    <form ng-submit="addComment()">
+        <h3>Add a new comment</h3>
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Comment" ng-model="body">
+        </div>
+        <button type="submit" class="btn btn-primary">Post</button>
+    </form>
+</script>
+</body>
 </html>
