@@ -72,7 +72,7 @@ router.get('/posts/:post', function (req, res) {
 });
 
 router.put('/posts/:post/upVote', function (req, res, next) {
-  req.post.update(function (err, post) {
+  req.post.upVote(function (err, post) {
     if (err) {
       return next(err);
     }

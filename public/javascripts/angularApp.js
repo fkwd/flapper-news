@@ -5,7 +5,12 @@ app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $u
     .state('home', {
       url: '/home',
       templateUrl: '/home.html',
-      controller: 'MainCtrl'
+      controller: 'MainCtrl',
+      resolve: {
+        postPromise: ['posts', function (posts) {
+          return posts.getAll();
+        }]
+      }
     })
     .state('posts', {
       url: '/posts/{id}',
@@ -15,8 +20,27 @@ app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $u
   $urlRouterProvider.otherwise('home');
 }]);
 
-app.factory('posts', [function () {
-  return {posts: []};
+app.factory('posts', ['$http', function ($http) {
+  var o = {
+    posts: [],
+    getAll: function () {
+      return $http.get('/posts').success(function (data) {
+        angular.copy(data, o.posts);
+      });
+    },
+    create: function (post) {
+      return $http.post('/posts', post).success(function (data) {
+        o.posts.push(data);
+      });
+    },
+    upVote: function (post) {
+      return $http.put('/posts/' + post._id + '/upVote')
+        .success(function (data) {
+          post.upVotes += 1;
+        });
+    }
+  };
+  return o;
 }]);
 
 app.controller('MainCtrl', ['$scope', 'posts', function ($scope, posts) {
@@ -27,20 +51,16 @@ app.controller('MainCtrl', ['$scope', 'posts', function ($scope, posts) {
     if (!$scope.title || $scope.title === '') {
       return;
     }
-    $scope.posts.push({
+    posts.create({
       title: $scope.title,
-      link: $scope.link,
-      upVotes: 0,
-      comments: [
-        {author: 'Joe', body: 'Cool post!', upVotes: 0},
-        {author: 'Bob', body: 'Great idea but everything is wrong!', upVotes: 0}
-      ]
+      link: $scope.link
     });
     $scope.title = '';
+    $scope.link = '';
   };
 
   $scope.incrementUpVotes = function (post) {
-    post.upVotes += 1;
+    posts.upVote(post);
   }
 
 }]);
