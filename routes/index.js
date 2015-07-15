@@ -80,7 +80,7 @@ router.put('/posts/:post/upVote', function (req, res, next) {
   });
 });
 
-router.post('/posts/:post/comment', function (req, res, next) {
+router.post('/posts/:post/comments', function (req, res, next) {
   var comment = new Comment(req.body);
   comment.post = req.post;
   comment.save(function (err, comment) {
