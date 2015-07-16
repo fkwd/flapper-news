@@ -1,22 +1,30 @@
-app.controller('PostsCtrl', ['$scope', 'posts', 'post', function ($scope, posts, post) {
+app.controller('PostsCtrl', [
+  '$scope',
+  'posts',
+  'post',
+  'auth',
+  function ($scope, posts, post, auth) {
 
-  $scope.post = post;
+    $scope.post = post;
 
-  $scope.addComment = function () {
-    if ($scope.body === '') {
-      return;
+    $scope.isLoggedIn = auth.isLoggedIn;
+
+    $scope.addComment = function () {
+      if ($scope.body === '') {
+        return;
+      }
+      posts.addComment(post._id, {
+        body: $scope.body,
+        author: 'user'
+      }).success(function (comment) {
+        $scope.post.comments.push(comment);
+      });
+      $scope.body = '';
+    };
+
+    $scope.incrementUpVotes = function (comment) {
+      posts.upVoteComment(post, comment);
     }
-    posts.addComment(post._id, {
-      body: $scope.body,
-      author: 'user'
-    }).success(function (comment) {
-      $scope.post.comments.push(comment);
-    });
-    $scope.body = '';
-  };
 
-  $scope.incrementUpVotes = function (comment) {
-    posts.upVoteComment(post, comment);
   }
-
-}]);
+]);

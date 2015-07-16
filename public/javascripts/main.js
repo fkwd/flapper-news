@@ -159,52 +159,67 @@ app.controller('AuthCtrl', ['$scope', '$state', 'auth', function ($scope, $state
   }
 }]);
 
-app.controller('MainCtrl', ['$scope', 'posts', function ($scope, posts) {
+app.controller('MainCtrl', [
+  '$scope',
+  'posts',
+  'auth',
+  function ($scope, posts, auth) {
 
-  $scope.posts = posts.posts;
+    $scope.posts = posts.posts;
 
-  $scope.addPost = function () {
-    if (!$scope.title || $scope.title === '') {
-      return;
+    $scope.isLoggedIn = auth.isLoggedIn;
+
+    $scope.addPost = function () {
+      if (!$scope.title || $scope.title === '') {
+        return;
+      }
+      posts.create({
+        title: $scope.title,
+        link: $scope.link
+      });
+      $scope.title = '';
+      $scope.link = '';
+    };
+
+    $scope.incrementUpVotes = function (post) {
+      posts.upVote(post);
     }
-    posts.create({
-      title: $scope.title,
-      link: $scope.link
-    });
-    $scope.title = '';
-    $scope.link = '';
-  };
 
-  $scope.incrementUpVotes = function (post) {
-    posts.upVote(post);
   }
-
-}]);
+]);
 
 app.controller('NavCtrl', ['$scope', 'auth', function ($scope, auth) {
   $scope.isLoggedIn = auth.isLoggedIn;
   $scope.currentUser = auth.currentUser;
   $scope.logOut = auth.logOut;
 }]);
-app.controller('PostsCtrl', ['$scope', 'posts', 'post', function ($scope, posts, post) {
+app.controller('PostsCtrl', [
+  '$scope',
+  'posts',
+  'post',
+  'auth',
+  function ($scope, posts, post, auth) {
 
-  $scope.post = post;
+    $scope.post = post;
 
-  $scope.addComment = function () {
-    if ($scope.body === '') {
-      return;
+    $scope.isLoggedIn = auth.isLoggedIn;
+
+    $scope.addComment = function () {
+      if ($scope.body === '') {
+        return;
+      }
+      posts.addComment(post._id, {
+        body: $scope.body,
+        author: 'user'
+      }).success(function (comment) {
+        $scope.post.comments.push(comment);
+      });
+      $scope.body = '';
+    };
+
+    $scope.incrementUpVotes = function (comment) {
+      posts.upVoteComment(post, comment);
     }
-    posts.addComment(post._id, {
-      body: $scope.body,
-      author: 'user'
-    }).success(function (comment) {
-      $scope.post.comments.push(comment);
-    });
-    $scope.body = '';
-  };
 
-  $scope.incrementUpVotes = function (comment) {
-    posts.upVoteComment(post, comment);
   }
-
-}]);
+]);
