@@ -12,6 +12,8 @@
     "ejs": "~2.3.2",
     "express": "~4.13.0",
     "express-jwt": "^3.0.1",
+    "gulp": "^3.9.0",
+    "gulp-concat": "^2.6.0",
     "jsonwebtoken": "^5.0.4",
     "mongoose": "^4.0.7",
     "morgan": "~1.6.1",
